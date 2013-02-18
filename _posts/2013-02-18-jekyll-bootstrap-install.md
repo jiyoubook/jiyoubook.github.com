@@ -2,7 +2,6 @@
 layout: post
 category : blog
 title : jekyll-bootstrap安装
-tagline ：
 tag : [jekyll,Jekyll-Bootstrap,github]
 ---
 {% include JB/setup %}
