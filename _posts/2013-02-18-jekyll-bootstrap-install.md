@@ -36,9 +36,9 @@ tags: [ jekyll , Bootstrap , github ]
 
 ### *如果你已经有了一个你的github博客，你可以在本地启你的jekyll服务：
 
-        $ git clone https://github.com/plusjade/jekyll-bootstrap.git
-        $ cd jekyll-bootstrap
-        $ jekyll --server
+    $ git clone https://github.com/plusjade/jekyll-bootstrap.git
+    $ cd jekyll-bootstrap
+    $ jekyll --server
 
 去看下[http://localhost:4000](http://localhost:4000).
 
