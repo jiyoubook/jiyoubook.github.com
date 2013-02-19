@@ -2,7 +2,7 @@
 layout: post
 category : blog
 title : ubuntu下右键在终端中打开
-tags : [ubuntu,terminal]
+tags : [ ubuntu , terminal ]
 ---
 {% include JB/setup %}
 
