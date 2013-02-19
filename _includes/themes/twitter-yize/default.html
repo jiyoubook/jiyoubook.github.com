@@ -13,17 +13,10 @@
     <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-
     <!-- Le styles -->
     <link href="{{ ASSET_PATH }}/css/bootstrap.min.css" rel="stylesheet">
-    <style type="text/css" media="screen">
-        body {
-            padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-        }
-    </style>
     <link href="{{ ASSET_PATH }}/css/bootstrap-responsive.min.css" rel="stylesheet">
-    <link href="{{ ASSET_PATH }}/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
-
+    <link href="{{ ASSET_PATH }}/css/style.min.css?body=1" rel="stylesheet" type="text/css" media="all">
     <!-- Le fav and touch icons -->
     <!-- Update these with your own images
       <link rel="shortcut icon" href="images/favicon.ico">
@@ -33,9 +26,7 @@
     -->
     <script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js" type="text/javascript" charset="utf-8"></script>
 </head>
-
 <body>
-
 <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
@@ -45,25 +36,19 @@
                 <span class="icon-bar"></span>
             </a>
             <a class="brand" href="{{ HOME_PATH }}">{{ site.title }}</a>
-
             <div class="nav-collapse">
                 <ul class="nav">
-                    {% assign pages_list = site.pages %}
-                    {% assign group = 'navigation' %}
-                    {% include JB/pages_list %}
+                    {% assign pages_list = site.pages %}{% assign group = 'navigation' %}{% include JB/pages_list %}
                 </ul>
             </div>
             <!--/.nav-collapse -->
         </div>
     </div>
 </div>
-
 <div class="container">
-
     <div class="content">
         {{ content }}
     </div>
-
     <footer>
         <p>&copy; {{ site.author.name }} 2012
             with help from <a href="http://jekyllbootstrap.com" target="_blank"
@@ -74,9 +59,9 @@
 
 </div>
 <!-- /container -->
-
-<script src="{{ ASSET_PATH }}/js/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="{{ ASSET_PATH }}/js/jquery.min.js"><\/script>')</script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="{{ ASSET_PATH }}/js/bootstrap.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://code.jquery.com/jquery-1.9.1.min.js"><\/script>')</script>
 {% include JB/analytics %}
 </body>
 </html>

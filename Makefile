@@ -13,7 +13,7 @@ build:
 	@echo "\n${HR}"
 	@echo "Building yize.github.com..."
 	@echo "${HR}\n"
-	@yuicompressor ${YIZECSS}/bootstrap.css -o ${YIZECSS}/bootstrap.min.css
+	@yuicompressor ${YIZECSS}/style.css -o ${YIZECSS}/style.min.css
 	@echo "Compiling and minifying css...       ${CHECK} Done"
 	@echo "\n${HR}"
 	@echo "yize.github.com successfully built at ${DATE}."
