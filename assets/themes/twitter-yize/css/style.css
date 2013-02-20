@@ -150,6 +150,11 @@ code, code a {
     font-family: Consolas, monospace
 }
 
+code{
+    background: none;
+    border: none;
+}
+
 pre {
     display: block;
     padding: 8.5px;
