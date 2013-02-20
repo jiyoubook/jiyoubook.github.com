@@ -31,7 +31,7 @@ tags : [ ubuntu , nginx , server]
 
 如果不需要支持combo的话，就不需要带`--with-http_concat_module`参数。
 
-装完以后当然要开始配置。
+装完以后当然要开始配置。(`配置本地代理，也就是assets.daily.taobao.net等指向本地文件夹`)
 
     sudo vi /usr/local/nginx/conf/nginx.conf
 
@@ -63,6 +63,10 @@ tags : [ ubuntu , nginx , server]
     sh ./tengine-combo.sh #需要concat模块
     or
     sh ./tengine.sh #不需要concat模块
+
+好了之后别忘了在`/etc/hosts`中增加127.0.0.1 assets.daily.taobao.net a.tbcdn.cn
+
+如果不想用本地代理的话，注释掉hosts中上面这一句就行了
 
 enjoy it!
 
