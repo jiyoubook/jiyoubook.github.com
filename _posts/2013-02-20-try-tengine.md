@@ -2,6 +2,7 @@
 layout: post
 category : blog
 title : 尝试使用Tengine(nginx)
+description : 使用Tengine(nginx)，打造本地combo服务器，方便前端本地开发，淘宝内部前端环境配置
 tags : [ ubuntu , nginx , server]
 ---
 {% include JB/setup %}
@@ -41,7 +42,7 @@ tags : [ ubuntu , nginx , server]
             listen  80;
             server_name assets.daily.taobao.net a.tbcdn.cn; #改成自己的assets_server
             concat on; #打开concat
-            root /home/pofa/work/assets/; #本地assets路径
+            root /home/pofa/work/assets/; #本地assets路径，需要改成自己的assets_path
             autoindex on;
             error_page 404 = @ucool; #淘宝ucool，如果文件不存在，从ucool取
             location @ucool{

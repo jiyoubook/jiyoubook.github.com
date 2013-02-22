@@ -10,12 +10,16 @@ markdown: rdiscount
 # so be sure to set them if your theme uses them.
 #
 
-title : yize`web
+title : shc`s website
 tagline: Site Tagline
 author :
   name : 邵寒超
+  name_e : shaohanchao
+  nick : 伊泽
+  nick_e : yize
   email : yize.shc@gmail.com
   github : yize
+keywords : web前端,JavaScript,Html,CSS
 # The production_url is only used when full-domain names are needed
 # such as sitemap.txt 
 # Most places will/should use BASE_PATH to make the urls

@@ -2,6 +2,7 @@
 layout: post
 category: blog
 title: jekyll-bootstrap安装
+description : 用jekyll-bootstrap安装，打造免费的github+jekyll+bootstrap博客。修改convertible.rb解决utf-8导致的jekyll服务无法启动
 tags: [ jekyll , Bootstrap , github ]
 ---
 {% include JB/setup %}

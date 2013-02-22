@@ -2,6 +2,7 @@
 layout: post
 category : blog
 title : ubuntu下右键在终端中打开
+description : ubuntu下，在GUI中浏览文件的时候，有时候需要用到terminal打开当前目录，比较好用的方法是安装nautilus-open-terminal
 tags : [ ubuntu , terminal ]
 ---
 {% include JB/setup %}
