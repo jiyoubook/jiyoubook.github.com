@@ -7,7 +7,7 @@ tags : [ browser ]
 ---
 <div class="preface">
     <h2>序言</h2>
-    <p>这是一篇全面介绍 Webkit 和 Gecko 内部操作的入门文章，是以色列开发人员塔利·加希尔大量研究的成果。在过去的几年中，她查阅了所有公开发布的关于浏览器内部机制的数据<small>（请参见<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Resources">资源</a>）</small>，并花了很多时间来研读网络浏览器的源代码。她写道：</p>
+    <p>这是一篇全面介绍 Webkit 和 Gecko 内部操作的入门文章，是以色列开发人员塔利·加希尔大量研究的成果。在过去的几年中，她查阅了所有公开发布的关于浏览器内部机制的数据<small>（请参见<a href="#Resources">资源</a>）</small>，并花了很多时间来研读网络浏览器的源代码。她写道：</p>
     <blockquote>在 IE 占据 90% 市场份额的年代，我们除了把浏览器当成一个“黑箱”，什么也做不了。但是现在，开放源代码的浏览器拥有了<a href="http://techcrunch.com/2011/08/01/open-web-browsers/" target="_blank">过半的市场份额</a>，因此，是时候来揭开神秘的面纱，一探网络浏览器的内幕了。呃，里面只有数以百万行计的 C++ 代码...</blockquote>
     塔利在<a href="http://taligarsiel.com/" target="_blank">她的网站</a>上公布了自己的研究成果，但是我们觉得它值得让更多的人来了解，所以我们在此重新整理并公布(原文：<a href="http://taligarsiel.com/Projects/howbrowserswork1.htm">How browsers work-Behind the scenes of modern web browsers</a>)。
     <p>作为一名网络开发人员，<strong>学习浏览器的内部工作原理将有助于您作出更明智的决策，并理解那些最佳开发实践的个中缘由</strong>。尽管这是一篇相当长的文档，但是我们建议您花些时间来仔细阅读；读完之后，您肯定会觉得所费不虚。<cite>保罗·爱丽诗 (Paul Irish)，Chrome 浏览器开发人员事务部</cite></p>
@@ -18,96 +18,96 @@ tags : [ browser ]
 <p>网络浏览器很可能是使用最广的软件。在这篇入门文章中，我将会介绍它们的幕后工作原理。我们会了解到，从您在地址栏输入&nbsp;<code>google.com</code>&nbsp;直到您在浏览器屏幕上看到 Google 首页的整个过程中都发生了些什么。</p>
 <h3>目录</h3>
 <ol class="toc">
-    <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Introduction">简介</a><ol>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_browsers_we_will_talk_about">我们要讨论的浏览器</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_browser_main_functionality">浏览器的主要功能</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_browser_high_level_structure">浏览器的高层结构</a></li>
+    <li><a href="#Introduction">简介</a><ol>
+        <li><a href="#The_browsers_we_will_talk_about">我们要讨论的浏览器</a></li>
+        <li><a href="#The_browser_main_functionality">浏览器的主要功能</a></li>
+        <li><a href="#The_browser_high_level_structure">浏览器的高层结构</a></li>
     </ol></li>
-    <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_rendering_engine">呈现引擎</a><ol>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Rendering_engines">呈现引擎</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_main_flow">主流程</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Main_flow_examples">主流程示例</a></li>
+    <li><a href="#The_rendering_engine">呈现引擎</a><ol>
+        <li><a href="#Rendering_engines">呈现引擎</a></li>
+        <li><a href="#The_main_flow">主流程</a></li>
+        <li><a href="#Main_flow_examples">主流程示例</a></li>
     </ol></li>
-    <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Parsing_general">解析和 DOM 树构建</a><ol>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Parsing_general">解析 - 综述</a><ol>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Grammars">语法</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Parser_Lexer_combination">解析器和词法分析器的组合</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Translation">翻译</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Parsing_example">解析示例</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Formal_definitions_for_vocabulary_and_syntax">词汇和语法的正式定义</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Types_of_parsers">解析器类型</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Generating_parsers_automatically">自动生成解析器</a></li>
+    <li><a href="#Parsing_general">解析和 DOM 树构建</a><ol>
+        <li><a href="#Parsing_general">解析 - 综述</a><ol>
+            <li><a href="#Grammars">语法</a></li>
+            <li><a href="#Parser_Lexer_combination">解析器和词法分析器的组合</a></li>
+            <li><a href="#Translation">翻译</a></li>
+            <li><a href="#Parsing_example">解析示例</a></li>
+            <li><a href="#Formal_definitions_for_vocabulary_and_syntax">词汇和语法的正式定义</a></li>
+            <li><a href="#Types_of_parsers">解析器类型</a></li>
+            <li><a href="#Generating_parsers_automatically">自动生成解析器</a></li>
         </ol></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#HTML_Parser">HTML 解析器</a><ol>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_HTML_grammar_definition">HTML 语法定义</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Not_a_context_free_grammar">非与上下文无关的语法</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#HTML_DTD">HTML DTD</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#DOM">DOM</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_parsing_algorithm">解析算法</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_tokenization_algorithm">标记化算法</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Tree_construction_algorithm">树构建算法</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Actions_when_the_parsing_is_finished">解析结束后的操作</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Browsers_error_tolerance">浏览器的容错机制</a></li>
+        <li><a href="#HTML_Parser">HTML 解析器</a><ol>
+            <li><a href="#The_HTML_grammar_definition">HTML 语法定义</a></li>
+            <li><a href="#Not_a_context_free_grammar">非与上下文无关的语法</a></li>
+            <li><a href="#HTML_DTD">HTML DTD</a></li>
+            <li><a href="#DOM">DOM</a></li>
+            <li><a href="#The_parsing_algorithm">解析算法</a></li>
+            <li><a href="#The_tokenization_algorithm">标记化算法</a></li>
+            <li><a href="#Tree_construction_algorithm">树构建算法</a></li>
+            <li><a href="#Actions_when_the_parsing_is_finished">解析结束后的操作</a></li>
+            <li><a href="#Browsers_error_tolerance">浏览器的容错机制</a></li>
         </ol></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#CSS_parsing">CSS 解析</a><ol>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Webkit_CSS_parser">Webkit CSS 解析器</a></li>
+        <li><a href="#CSS_parsing">CSS 解析</a><ol>
+            <li><a href="#Webkit_CSS_parser">Webkit CSS 解析器</a></li>
         </ol></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_order_of_processing_scripts_and_style_sheets">处理脚本和样式表的顺序</a><ol>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Scripts">脚本</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Speculative_parsing">预解析</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Style_sheets">样式表</a></li>
+        <li><a href="#The_order_of_processing_scripts_and_style_sheets">处理脚本和样式表的顺序</a><ol>
+            <li><a href="#Scripts">脚本</a></li>
+            <li><a href="#Speculative_parsing">预解析</a></li>
+            <li><a href="#Style_sheets">样式表</a></li>
         </ol></li>
     </ol></li>
-    <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Render_tree_construction">呈现树构建</a><ol>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_render_tree_relation_to_the_DOM_tree">呈现树和 DOM 树的关系</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_flow_of_constructing_the_tree">构建呈现树的流程</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Style_Computation">样式计算</a><ol>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Sharing_style_data">共享样式数据</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Firefox_rule_tree">Firefox 规则树</a><ol>
-                <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Division_into_structs">结构划分</a></li>
-                <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Computing_the_style_contexts_using_the_rule_tree">使用规则树计算样式上下文</a></li>
+    <li><a href="#Render_tree_construction">呈现树构建</a><ol>
+        <li><a href="#The_render_tree_relation_to_the_DOM_tree">呈现树和 DOM 树的关系</a></li>
+        <li><a href="#The_flow_of_constructing_the_tree">构建呈现树的流程</a></li>
+        <li><a href="#Style_Computation">样式计算</a><ol>
+            <li><a href="#Sharing_style_data">共享样式数据</a></li>
+            <li><a href="#Firefox_rule_tree">Firefox 规则树</a><ol>
+                <li><a href="#Division_into_structs">结构划分</a></li>
+                <li><a href="#Computing_the_style_contexts_using_the_rule_tree">使用规则树计算样式上下文</a></li>
             </ol></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Manipulating_the_rules_for_an_easy_match">对规则进行处理以简化匹配</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Applying_the_rules_in_the_correct_cascade_order">以正确的层叠顺序应用规则</a><ol>
-                <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Style_sheet_cascade_order">样式表层叠顺序</a></li>
-                <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Specificity">特异性</a></li>
-                <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Sorting_the_rules">规则排序</a></li>
+            <li><a href="#Manipulating_the_rules_for_an_easy_match">对规则进行处理以简化匹配</a></li>
+            <li><a href="#Applying_the_rules_in_the_correct_cascade_order">以正确的层叠顺序应用规则</a><ol>
+                <li><a href="#Style_sheet_cascade_order">样式表层叠顺序</a></li>
+                <li><a href="#Specificity">特异性</a></li>
+                <li><a href="#Sorting_the_rules">规则排序</a></li>
             </ol></li>
         </ol></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Gradual_process">渐进式处理</a></li>
+        <li><a href="#Gradual_process">渐进式处理</a></li>
     </ol></li>
-    <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Layout">布局</a><ol>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Dirty_bit_system">Dirty 位系统</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Global_and_incremental_layout">全局布局和增量布局</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Asynchronous_and_Synchronous_layout">异步布局和同步布局</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Optimizations">优化</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_layout_process">布局处理</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Width_calculation">宽度计算</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Line_Breaking">换行</a></li>
+    <li><a href="#Layout">布局</a><ol>
+        <li><a href="#Dirty_bit_system">Dirty 位系统</a></li>
+        <li><a href="#Global_and_incremental_layout">全局布局和增量布局</a></li>
+        <li><a href="#Asynchronous_and_Synchronous_layout">异步布局和同步布局</a></li>
+        <li><a href="#Optimizations">优化</a></li>
+        <li><a href="#The_layout_process">布局处理</a></li>
+        <li><a href="#Width_calculation">宽度计算</a></li>
+        <li><a href="#Line_Breaking">换行</a></li>
     </ol></li>
-    <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Painting">绘制</a><ol>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Global_and_Incremental">全局绘制和增量绘制</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_painting_order">绘制顺序</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Firefox_display_list">Firefox 显示列表</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Webkit_rectangle_storage">Webkit 矩形存储</a></li>
+    <li><a href="#Painting">绘制</a><ol>
+        <li><a href="#Global_and_Incremental">全局绘制和增量绘制</a></li>
+        <li><a href="#The_painting_order">绘制顺序</a></li>
+        <li><a href="#Firefox_display_list">Firefox 显示列表</a></li>
+        <li><a href="#Webkit_rectangle_storage">Webkit 矩形存储</a></li>
     </ol></li>
-    <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Dynamic_changes">动态变化</a></li>
-    <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_rendering_engines_threads">呈现引擎的线程</a><ol>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Event_loop">事件循环</a></li>
+    <li><a href="#Dynamic_changes">动态变化</a></li>
+    <li><a href="#The_rendering_engines_threads">呈现引擎的线程</a><ol>
+        <li><a href="#Event_loop">事件循环</a></li>
     </ol></li>
-    <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#css">CSS2 可视化模型</a><ol>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#The_canvas">画布</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#CSS_Box_model">CSS 框模型</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Positioning_scheme">定位方案</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Box_types">框类型</a></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Positioning">定位</a><ol>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Relative">相对定位</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Floats">浮动定位</a></li>
-            <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Absolute_and_fixed">绝对定位和固定定位</a></li>
+    <li><a href="#css">CSS2 可视化模型</a><ol>
+        <li><a href="#The_canvas">画布</a></li>
+        <li><a href="#CSS_Box_model">CSS 框模型</a></li>
+        <li><a href="#Positioning_scheme">定位方案</a></li>
+        <li><a href="#Box_types">框类型</a></li>
+        <li><a href="#Positioning">定位</a><ol>
+            <li><a href="#Relative">相对定位</a></li>
+            <li><a href="#Floats">浮动定位</a></li>
+            <li><a href="#Absolute_and_fixed">绝对定位和固定定位</a></li>
         </ol></li>
-        <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Layered_representation">分层展示</a></li>
+        <li><a href="#Layered_representation">分层展示</a></li>
     </ol></li>
-    <li><a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Resources">资源</a></li>
+    <li><a href="#Resources">资源</a></li>
 </ol>
 <div>
     <h3 id="The_browsers_we_will_talk_about"><span class="tocnum">1.1</span>我们要讨论的浏览器</h3>
@@ -136,7 +136,7 @@ tags : [ browser ]
     </ul>
     <p>奇怪的是，浏览器的用户界面并没有任何正式的规范，这是多年来的最佳实践自然发展以及彼此之间相互模仿的结果。HTML5 也没有定义浏览器必须具有的用户界面元素，但列出了一些通用的元素，例如地址栏、状态栏和工具栏等。当然，各浏览器也可以有自己独特的功能，比如 Firefox 的下载管理器。</p>
     <h3 id="The_browser_high_level_structure"><span class="tocnum">1.3</span>浏览器的高层结构</h3>
-    <p>浏览器的主要组件为 (<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#1_1">1.1</a>)：</p>
+    <p>浏览器的主要组件为 (<a href="#1_1">1.1</a>)：</p>
     <ol>
         <li><strong>用户界面</strong>&nbsp;- 包括地址栏、前进/后退按钮、书签菜单等。除了浏览器主窗口显示的您请求的页面外，其他显示的各个部分都属于用户界面。</li>
         <li><strong>浏览器引擎</strong>&nbsp;- 在用户界面和呈现引擎之间传送指令。</li>
@@ -182,9 +182,9 @@ tags : [ browser ]
 
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<img title="" src="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/zh/tutorials/internals/howbrowserswork/flow.png.pagespeed.ce.pK__f2HjCm.png" alt="" width="600" height="66"></div>
 <div><span data-count="2">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;图</span>：呈现引擎的基本流程。
-    <p>呈现引擎将开始解析 HTML 文档，并将各标记逐个转化成“内容树”上的&nbsp;<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#DOM">DOM</a>&nbsp;节点。同时也会解析外部 CSS 文件以及样式元素中的样式数据。HTML 中这些带有视觉指令的样式信息将用于创建另一个树结构：<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Render_tree_construction">呈现树</a>。</p>
+    <p>呈现引擎将开始解析 HTML 文档，并将各标记逐个转化成“内容树”上的&nbsp;<a href="#DOM">DOM</a>&nbsp;节点。同时也会解析外部 CSS 文件以及样式元素中的样式数据。HTML 中这些带有视觉指令的样式信息将用于创建另一个树结构：<a href="#Render_tree_construction">呈现树</a>。</p>
     <p>呈现树包含多个带有视觉属性（如颜色和尺寸）的矩形。这些矩形的排列顺序就是它们将在屏幕上显示的顺序。</p>
-    <p>呈现树构建完毕之后，进入“<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#layout">布局</a>”处理阶段，也就是为每个节点分配一个应出现在屏幕上的确切坐标。下一个阶段是<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Painting">绘制</a>&nbsp;- 呈现引擎会遍历呈现树，由用户界面后端层将每个节点绘制出来。</p>
+    <p>呈现树构建完毕之后，进入“<a href="#layout">布局</a>”处理阶段，也就是为每个节点分配一个应出现在屏幕上的确切坐标。下一个阶段是<a href="#Painting">绘制</a>&nbsp;- 呈现引擎会遍历呈现树，由用户界面后端层将每个节点绘制出来。</p>
     <p>需要着重指出的是，这是一个渐进的过程。为达到更好的用户体验，呈现引擎会力求尽快将内容显示在屏幕上。它不必等到整个 HTML 文档解析完毕之后，就会开始构建呈现树和设置布局。在不断接收和处理来自网络的其余内容的同时，呈现引擎会将部分内容解析并显示出来。</p>
     <h4 id="Main_flow_examples"><span class="tocnum">2.3</span>主流程示例</h4>
 
@@ -201,7 +201,7 @@ tags : [ browser ]
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<img src="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/zh/tutorials/internals/howbrowserswork/webkitflow.png.pagespeed.ce.KhQEkvbb3q.png" alt="" width="624" height="289"></div>
 <div><span data-count="3">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 图</span>：Webkit 主流程</div>
 <div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<img src="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/zh/tutorials/internals/howbrowserswork/624x290wimage008.jpg.pagespeed.ic.Oe-U0yQz2z.webp" alt="" width="624" height="290"></div>
-<div><span data-count="4">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;图</span>：Mozilla 的 Gecko 呈现引擎主流程 (<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#3_6">3.6</a>)
+<div><span data-count="4">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;图</span>：Mozilla 的 Gecko 呈现引擎主流程 (<a href="#3_6">3.6</a>)
     <p>从图 3 和图 4 可以看出，虽然 Webkit 和 Gecko 使用的术语略有不同，但整体流程是基本相同的。</p>
     <p>Gecko 将视觉格式化元素组成的树称为“框架树”。每个元素都是一个框架。Webkit 使用的术语是“呈现树”，它由“呈现对象”组成。对于元素的放置，Webkit 使用的术语是“布局”，而 Gecko 称之为“重排”。对于连接 DOM 节点和可视化信息从而创建呈现树的过程，Webkit 使用的术语是“附加”。有一个细微的非语义差别，就是 Gecko 在 HTML 与 DOM 树之间还有一个称为“内容槽”的层，用于生成 DOM 元素。我们会逐一论述流程中的每一部分：</p>
     <p>&nbsp;</p>
@@ -224,7 +224,7 @@ tags : [ browser ]
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<img src="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/zh/tutorials/internals/howbrowserswork/400x155wimage009.png.pagespeed.ic.KNewBFnKFk.png" alt="" width="400" height="155"></div>
 <div><span data-count="5">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;图</span>：数学表达式树节点
     <h4 id="Grammars"><span class="tocnum">3.1.1</span>语法</h4>
-    <p>解析是以文档所遵循的语法规则（编写文档所用的语言或格式）为基础的。所有可以解析的格式都必须对应确定的语法（由词汇和语法规则构成）。这称为<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#context_free_grammar">与上下文无关的语法</a>。人类语言并不属于这样的语言，因此无法用常规的解析技术进行解析。</p>
+    <p>解析是以文档所遵循的语法规则（编写文档所用的语言或格式）为基础的。所有可以解析的格式都必须对应确定的语法（由词汇和语法规则构成）。这称为<a href="#context_free_grammar">与上下文无关的语法</a>。人类语言并不属于这样的语言，因此无法用常规的解析技术进行解析。</p>
     <h4 id="Parser_Lexer_combination"><span class="tocnum">3.1.2</span>解析器和词法分析器的组合</h4>
     <p>解析的过程可以分成两个子过程：词法分析和语法分析。</p>
     <p>词法分析是将输入内容分割成大量标记的过程。标记是语言中的词汇，即构成内容的单位。在人类语言中，它相当于语言字典中的单词。</p>
@@ -341,7 +341,7 @@ term </span><span class="pun">:=</span><span class="pln"> INTEGER </span><span c
     <h3 id="HTML_Parser"><span class="tocnum">3.2</span>HTML 解析器</h3>
     <p>HTML 解析器的任务是将 HTML 标记解析成解析树。</p>
     <h4 id="The_HTML_grammar_definition"><span class="tocnum">3.2.1</span>HTML 语法定义</h4>
-    <p>HTML 的词汇和语法在 W3C 组织创建的<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#w3c">规范</a>中进行了定义。当前的版本是 HTML4，HTML5 正在处理过程中。</p>
+    <p>HTML 的词汇和语法在 W3C 组织创建的<a href="#w3c">规范</a>中进行了定义。当前的版本是 HTML4，HTML5 正在处理过程中。</p>
     <h4 id="Not_a_context_free_grammar"><span class="tocnum">3.2.2</span>非与上下文无关的语法</h4>
     <p>正如我们在解析过程的简介中已经了解到的，语法可以用 BNF 等格式进行正式定义。</p>
     <p>很遗憾，所有的常规解析器都不适用于 HTML（我并不是开玩笑，它们可以用于解析 CSS 和 JavaScript）。HTML 并不能很容易地用解析器所需的与上下文无关的语法来定义。</p>
@@ -486,7 +486,7 @@ ident   {nmstart}{nmchar}*
     这表示一个规则集就是一个选择器，或者由逗号和空格（S 表示空格）分隔的多个（数量可选）选择器。规则集包含了大括号，以及其中的一个或多个（数量可选）由分号分隔的声明。“声明”和“选择器”将由下面的 BNF 格式定义。
     <p>&nbsp;</p>
     <h4 id="Webkit_CSS_parser"><span class="tocnum">3.3.1</span>Webkit CSS 解析器</h4>
-    <p>Webkit 使用&nbsp;<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#parser_generators">Flex 和 Bison</a>&nbsp;解析器生成器，通过 CSS 语法文件自动创建解析器。正如我们之前在解析器简介中所说，Bison 会创建自下而上的移位归约解析器。Firefox 使用的是人工编写的自上而下的解析器。这两种解析器都会将 CSS 文件解析成 StyleSheet 对象，且每个对象都包含 CSS 规则。CSS 规则对象则包含选择器和声明对象，以及其他与 CSS 语法对应的对象。</p>
+    <p>Webkit 使用&nbsp;<a href="#parser_generators">Flex 和 Bison</a>&nbsp;解析器生成器，通过 CSS 语法文件自动创建解析器。正如我们之前在解析器简介中所说，Bison 会创建自下而上的移位归约解析器。Firefox 使用的是人工编写的自上而下的解析器。这两种解析器都会将 CSS 文件解析成 StyleSheet 对象，且每个对象都包含 CSS 规则。CSS 规则对象则包含选择器和声明对象，以及其他与 CSS 语法对应的对象。</p>
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<img src="http://pic002.cnblogs.com/images/2012/40481/2012103113243956.png" alt=""><br><span data-count="12">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;图</span>：解析 CSS
     <h3 id="The_order_of_processing_scripts_and_style_sheets"><span class="tocnum">3.4</span>处理脚本和样式表的顺序</h3>
     <h4 id="Scripts"><span class="tocnum">3.4.1</span>脚本</h4>
@@ -501,7 +501,7 @@ ident   {nmstart}{nmchar}*
     <p>Firefox 将呈现树中的元素称为“框架”。Webkit 使用的术语是呈现器或呈现对象。&nbsp;<br>呈现器知道如何布局并将自身及其子元素绘制出来。&nbsp;<br>Webkits RenderObject 类是所有呈现器的基类，其定义如下：</p>
     <pre class="prettyprint"><span class="kwd">class</span><span class="typ">RenderObject</span><span class="pun">{</span><span class="kwd">virtual</span><span class="kwd">void</span><span class="pln"> layout</span><span class="pun">();</span><span class="kwd">virtual</span><span class="kwd">void</span><span class="pln"> paint</span><span class="pun">(</span><span class="typ">PaintInfo</span><span class="pun">);</span><span class="kwd">virtual</span><span class="kwd">void</span><span class="pln"> rect repaintRect</span><span class="pun">();</span><span class="typ">Node</span><span class="pun">*</span><span class="pln"> node</span><span class="pun">;</span><span class="com">//the DOM node</span><span class="typ">RenderStyle</span><span class="pun">*</span><span class="pln"> style</span><span class="pun">;</span><span class="com">// the computed style</span><span class="typ">RenderLayer</span><span class="pun">*</span><span class="pln"> containgLayer</span><span class="pun">;</span><span class="com">//the containing z-index layer</span><span class="pun">}</span></pre>
     <p>&nbsp;</p>
-    <p>每一个呈现器都代表了一个矩形的区域，通常对应于相关节点的 CSS 框，这一点在 CSS2 规范中有所描述。它包含诸如宽度、高度和位置等几何信息。&nbsp;<br>框的类型会受到与节点相关的“display”样式属性的影响（请参阅<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#style_computation">样式计算</a>章节）。下面这段 Webkit 代码描述了根据 display 属性的不同，针对同一个 DOM 节点应创建什么类型的呈现器。</p>
+    <p>每一个呈现器都代表了一个矩形的区域，通常对应于相关节点的 CSS 框，这一点在 CSS2 规范中有所描述。它包含诸如宽度、高度和位置等几何信息。&nbsp;<br>框的类型会受到与节点相关的“display”样式属性的影响（请参阅<a href="#style_computation">样式计算</a>章节）。下面这段 Webkit 代码描述了根据 display 属性的不同，针对同一个 DOM 节点应创建什么类型的呈现器。</p>
 <pre class="prettyprint"><span class="typ">RenderObject</span><span class="pun">*</span><span class="typ">RenderObject</span><span class="pun">::</span><span class="pln">createObject</span><span class="pun">(</span><span class="typ">Node</span><span class="pun">*</span><span class="pln"> node</span><span class="pun">,</span><span class="typ">RenderStyle</span><span class="pun">*</span><span class="pln"> style</span><span class="pun">)</span><span class="pun">{</span><span class="typ">Document</span><span class="pun">*</span><span class="pln"> doc </span><span class="pun">=</span><span class="pln"> node</span><span class="pun">-&gt;</span><span class="pln">document</span><span class="pun">();</span><span class="typ">RenderArena</span><span class="pun">*</span><span class="pln"> arena </span><span class="pun">=</span><span class="pln"> doc</span><span class="pun">-&gt;</span><span class="pln">renderArena</span><span class="pun">();</span><span class="pun">...</span><span class="typ">RenderObject</span><span class="pun">*</span><span class="pln"> o </span><span class="pun">=</span><span class="lit">0</span><span class="pun">;</span><span class="kwd">switch</span><span class="pun">(</span><span class="pln">style</span><span class="pun">-&gt;</span><span class="pln">display</span><span class="pun">())</span><span class="pun">{</span><span class="kwd">case</span><span class="pln"> NONE</span><span class="pun">:</span><span class="kwd">break</span><span class="pun">;</span><span class="kwd">case</span><span class="pln"> INLINE</span><span class="pun">:</span><span class="pln">
             o </span><span class="pun">=</span><span class="kwd">new</span><span class="pun">(</span><span class="pln">arena</span><span class="pun">)</span><span class="typ">RenderInline</span><span class="pun">(</span><span class="pln">node</span><span class="pun">);</span><span class="kwd">break</span><span class="pun">;</span><span class="kwd">case</span><span class="pln"> BLOCK</span><span class="pun">:</span><span class="pln">
             o </span><span class="pun">=</span><span class="kwd">new</span><span class="pun">(</span><span class="pln">arena</span><span class="pun">)</span><span class="typ">RenderBlock</span><span class="pun">(</span><span class="pln">node</span><span class="pun">);</span><span class="kwd">break</span><span class="pun">;</span><span class="kwd">case</span><span class="pln"> INLINE_BLOCK</span><span class="pun">:</span><span class="pln">
@@ -526,9 +526,9 @@ ident   {nmstart}{nmchar}*
 
 
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<img src="http://1-ps.googleusercontent.com/x/s.html5rocks-hrd.appspot.com/www.html5rocks.com/zh/tutorials/internals/howbrowserswork/image025.png.pagespeed.ce.3lhNd6H7V4.png" alt="" width="731" height="396"></div>
-<div><span data-count="13">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 图</span>：呈现树及其对应的 DOM 树 (<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#3_1">3.1</a>)。初始容器 block 为“viewport”，而在 Webkit 中则为“RenderView”对象。
+<div><span data-count="13">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 图</span>：呈现树及其对应的 DOM 树 (<a href="#3_1">3.1</a>)。初始容器 block 为“viewport”，而在 Webkit 中则为“RenderView”对象。
 <h5 id="The_flow_of_constructing_the_tree"><span class="tocnum">4.2</span>构建呈现树的流程</h5>
-<p>在 Firefox 中，系统会针对 DOM 更新注册展示层，作为侦听器。展示层将框架创建工作委托给&nbsp;<code>FrameConstructor</code>，由该构造器解析样式（请参阅<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#style">样式计算</a>）并创建框架。</p>
+<p>在 Firefox 中，系统会针对 DOM 更新注册展示层，作为侦听器。展示层将框架创建工作委托给&nbsp;<code>FrameConstructor</code>，由该构造器解析样式（请参阅<a href="#style">样式计算</a>）并创建框架。</p>
 <p>在 Webkit 中，解析样式和创建呈现器的过程称为“附加”。每个 DOM 节点都有一个“attach”方法。附加是同步进行的，将节点插入 DOM 树需要调用新的节点“attach”方法。</p>
 <p>处理 html 和 body 标记就会构建呈现树根节点。这个根节点呈现对象对应于 CSS 规范中所说的容器 block，这是最上层的 block，包含了其他所有 block。它的尺寸就是视口，即浏览器窗口显示区域的尺寸。Firefox 称之为&nbsp;<code>ViewPortFrame</code>，而 Webkit 称之为&nbsp;<code>RenderView</code>。这就是文档所指向的呈现对象。呈现树的其余部分以 DOM 树节点插入的形式来构建。</p>
 <p>请参阅<a href="http://www.w3.org/TR/CSS21/intro.html#processing-model" target="_blank">关于处理模型的 CSS2 规范</a>。</p>
@@ -562,7 +562,7 @@ ident   {nmstart}{nmchar}*
 </ol>
 <h5 id="Firefox_rule_tree"><span class="tocnum">4.3.2</span>Firefox 规则树</h5>
 <p>为了简化样式计算，Firefox 还采用了另外两种树：规则树和样式上下文树。Webkit 也有样式对象，但它们不是保存在类似样式上下文树这样的树结构中，只是由 DOM 节点指向此类对象的相关样式。</p>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<img src="http://pic002.cnblogs.com/images/2012/40481/2012103113264155.png" alt=""><br><span data-count="14">图</span>：Firefox 样式上下文树 (<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#2_2">2.2</a>)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<img src="http://pic002.cnblogs.com/images/2012/40481/2012103113264155.png" alt=""><br><span data-count="14">图</span>：Firefox 样式上下文树 (<a href="#2_2">2.2</a>)
 <p>样式上下文包含端值。要计算出这些值，应按照正确顺序应用所有的匹配规则，并将其从逻辑值转化为具体的值。例如，如果逻辑值是屏幕大小的百分比，则需要换算成绝对的单位。规则树的点子真的很巧妙，它使得节点之间可以共享这些值，以避免重复计算，还可以节约空间。</p>
 <p>所有匹配的规则都存储在树中。路径中的底层节点拥有较高的优先级。规则树包含了所有已知规则匹配的路径。规则的存储是延迟进行的。规则树不会在开始的时候就为所有的节点进行计算，而是只有当某个节点样式需要进行计算时，才会向规则树添加计算的路径。</p>
 <p>这个想法相当于将规则树路径视为词典中的单词。如果我们已经计算出如下的规则树：</p>
@@ -606,7 +606,7 @@ ident   {nmstart}{nmchar}*
 那么，该段落元素作为上下文树中的 div 的子代，就会共享与其父代相同的 font 结构（前提是该段落没有指定 font 规则）。
 <p>&nbsp;</p>
 <p>在 Webkit 中没有规则树，因此会对匹配的声明遍历 4 次。首先应用非重要高优先级的属性（由于作为其他属性的依据而应首先应用的属性，例如 display），接着是高优先级重要规则，然后是普通优先级非重要规则，最后是普通优先级重要规则。这意味着多次出现的属性会根据正确的层叠顺序进行解析。最后出现的最终生效。&nbsp;</p>
-<p>因此概括来说，共享样式对象（整个对象或者对象中的部分结构）可以解决问题&nbsp;<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#issue1">1</a>&nbsp;和问题&nbsp;<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#issue3">3</a>。Firefox 规则树还有助于按照正确的顺序应用属性。</p>
+<p>因此概括来说，共享样式对象（整个对象或者对象中的部分结构）可以解决问题&nbsp;<a href="#issue1">1</a>&nbsp;和问题&nbsp;<a href="#issue3">3</a>。Firefox 规则树还有助于按照正确的顺序应用属性。</p>
 <h5 id="Manipulating_the_rules_for_an_easy_match"><span class="tocnum">4.3.3</span>对规则进行处理以简化匹配</h5>
 <p>样式规则有一些来源：</p>
 <ul>
@@ -621,8 +621,8 @@ ident   {nmstart}{nmchar}*
     </li>
 </ul>
 <p>后两种很容易和元素进行匹配，因为元素拥有样式属性，而且 HTML 属性可以使用元素作为键值进行映射。</p>
-<p>我们之前在<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#issue2">第 2 个问题</a>中提到过，CSS 规则匹配可能比较棘手。为了解决这一难题，可以对 CSS 规则进行一些处理，以便访问。</p>
-<p>样式表解析完毕后，系统会根据选择器将 CSS 规则添加到某个哈希表中。这些哈希表的选择器各不相同，包括 ID、类名称、标记名称等，还有一种通用哈希表，适合不属于上述类别的规则。如果选择器是 ID，规则就会添加到 ID 表中；如果选择器是类，规则就会添加到类表中，依此类推。&nbsp;<br>这种处理可以大大简化规则匹配。我们无需查看每一条声明，只要从哈希表中提取元素的相关规则即可。这种优化方法可排除掉 95% 以上规则，因此在匹配过程中根本就不用考虑这些规则了 (<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#4_1">4.1</a>)。</p>
+<p>我们之前在<a href="#issue2">第 2 个问题</a>中提到过，CSS 规则匹配可能比较棘手。为了解决这一难题，可以对 CSS 规则进行一些处理，以便访问。</p>
+<p>样式表解析完毕后，系统会根据选择器将 CSS 规则添加到某个哈希表中。这些哈希表的选择器各不相同，包括 ID、类名称、标记名称等，还有一种通用哈希表，适合不属于上述类别的规则。如果选择器是 ID，规则就会添加到 ID 表中；如果选择器是类，规则就会添加到类表中，依此类推。&nbsp;<br>这种处理可以大大简化规则匹配。我们无需查看每一条声明，只要从哈希表中提取元素的相关规则即可。这种优化方法可排除掉 95% 以上规则，因此在匹配过程中根本就不用考虑这些规则了 (<a href="#4_1">4.1</a>)。</p>
 <p>我们以如下的样式规则为例：</p>
 <pre class="prettyprint"><span class="pln">p</span><span class="pun">.</span><span class="pln">error </span><span class="pun">{</span><span class="pln">color</span><span class="pun">:</span><span class="pln">red</span><span class="pun">}</span><span class="com">#messageDiv {height:50px}</span><span class="pln">
 div </span><span class="pun">{</span><span class="pln">margin</span><span class="pun">:</span><span class="lit">5px</span><span class="pun">}</span></pre>
@@ -646,7 +646,7 @@ div </span><span class="pun">{</span><span class="pln">margin</span><span class=
     <li>用户重要声明</li>
 </ol>
 <p>&nbsp;</p>
-<p>浏览器声明是重要程度最低的，而用户只有将该声明标记为“重要”才可以替换网页作者的声明。同样顺序的声明会根据<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#Specificity">特异性</a>进行排序，然后再是其指定顺序。HTML 可视化属性会转换成匹配的 CSS 声明。它们被视为低优先级的网页作者规则。</p>
+<p>浏览器声明是重要程度最低的，而用户只有将该声明标记为“重要”才可以替换网页作者的声明。同样顺序的声明会根据<a href="#Specificity">特异性</a>进行排序，然后再是其指定顺序。HTML 可视化属性会转换成匹配的 CSS 声明。它们被视为低优先级的网页作者规则。</p>
 <h5 id="Specificity">特异性</h5>
 <p>选择器的特异性由&nbsp;<a href="http://www.w3.org/TR/CSS2/cascade.html#specificity" target="_blank">CSS2 规范</a>定义如下：</p>
 <ul>
@@ -678,7 +678,7 @@ div </span><span class="pun">{</span><span class="pln">margin</span><span class=
 <h5 class="tocchap">Chapter 5</h5>
 <h3 id="Layout">布局</h3>
 <p>呈现器在创建完成并添加到呈现树时，并不包含位置和大小信息。计算这些值的过程称为布局或重排。</p>
-<p>HTML 采用基于流的布局模型，这意味着大多数情况下只要一次遍历就能计算出几何信息。处于流中靠后位置元素通常不会影响靠前位置元素的几何特征，因此布局可以按从左至右、从上至下的顺序遍历文档。但是也有例外情况，比如 HTML 表格的计算就需要不止一次的遍历 (<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#3_5">3.5</a>)。</p>
+<p>HTML 采用基于流的布局模型，这意味着大多数情况下只要一次遍历就能计算出几何信息。处于流中靠后位置元素通常不会影响靠前位置元素的几何特征，因此布局可以按从左至右、从上至下的顺序遍历文档。但是也有例外情况，比如 HTML 表格的计算就需要不止一次的遍历 (<a href="#3_5">3.5</a>)。</p>
 <p>坐标系是相对于根框架而建立的，使用的是上坐标和左坐标。</p>
 <p>布局是一个递归的过程。它从根呈现器（对应于 HTML 文档的&nbsp;<code>&lt;html&gt;</code>&nbsp;元素）开始，然后递归遍历部分或所有的框架层次结构，为每一个需要计算的呈现器计算几何信息。</p>
 根呈现器的位置左边是 0,0，其尺寸为视口（也就是浏览器窗口的可见区域）。
@@ -704,7 +704,7 @@ div </span><span class="pun">{</span><span class="pln">margin</span><span class=
 
 
 
-<span data-count="17">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 图</span>：增量布局 - 只有 dirty 呈现器及其子代进行布局 (<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#3_6">3.6</a>)。
+<span data-count="17">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 图</span>：增量布局 - 只有 dirty 呈现器及其子代进行布局 (<a href="#3_6">3.6</a>)。
 <h4 id="Asynchronous_and_Synchronous_layout"><span class="tocnum">5.3</span>异步布局和同步布局</h4>
 
 
@@ -801,7 +801,7 @@ div </span><span class="pun">{</span><span class="pln">margin</span><span class=
 
 
 
-<a href="http://www.w3.org/TR/CSS21/zindex.html" target="_blank">CSS2 规范定义了绘制流程的顺序</a>。绘制的顺序其实就是元素进入<a href="http://www.shaohanchao.cn/post/2013/02/25/how-browsers-work1/index.html#stackingcontext">堆栈样式上下文</a>的顺序。这些堆栈会从后往前绘制，因此这样的顺序会影响绘制。块呈现器的堆栈顺序如下：<ol>
+<a href="http://www.w3.org/TR/CSS21/zindex.html" target="_blank">CSS2 规范定义了绘制流程的顺序</a>。绘制的顺序其实就是元素进入<a href="#stackingcontext">堆栈样式上下文</a>的顺序。这些堆栈会从后往前绘制，因此这样的顺序会影响绘制。块呈现器的堆栈顺序如下：<ol>
     <li>背景颜色</li>
     <li>背景图片</li>
     <li>边框</li>
