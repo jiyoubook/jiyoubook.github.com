@@ -25,7 +25,6 @@
       <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
       <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
     -->
-    <script src="{{ ASSET_PATH }}/js/wb.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
 <div class="navbar navbar-fixed-top">
@@ -56,9 +55,11 @@
 
 </div>
 <!-- /container -->
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-<script type="text/javascript" src="{{ ASSET_PATH }}/js/bootstrap.min.js"></script>
-<script>window.jQuery || document.write('<script src="http://code.jquery.com/jquery-1.9.1.min.js"><\/script>')</script>
+<script type="text/javascript" src="{{ ASSET_PATH }}/js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript">
+    var asset_path = '{{ ASSET_PATH }}';
+</script>
+<script type="text/javascript" src="{{ ASSET_PATH }}/js/main.js"></script>
 {% include JB/analytics %}
 </body>
 </html>

@@ -9,7 +9,7 @@ tags : [ ubuntu , nginx , server]
 
 最近这几天信息量比较大，接触了很多的东西，学了很多，先不说学习方法问题，至少个人在成长。
 
-今天和@淘宝道璘 一起在玩Tengine
+今天和<a wb_screen_name="淘宝道璘" href="#">@淘宝道璘</a> 一起在玩Tengine
 
 想要做的事情是从apache换到Tengine，道璘之前有研究过nginx，他说：在windows上，nginx存在两个问题，一个是中文路径，两外一个是php不稳定。后来还是切回了apache。
 
