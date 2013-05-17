@@ -2,6 +2,7 @@
 layout: post
 category : blog
 title : 前端编码问题汇总
+tags : [ js , encode]
 ---
 {% include JB/setup %}
 
