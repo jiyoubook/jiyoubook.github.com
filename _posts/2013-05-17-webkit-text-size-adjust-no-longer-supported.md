@@ -2,7 +2,7 @@
 layout: post
 category : blog
 title : webkit桌面版本浏览器将不再支持-webkit-text-size-adjust
-tag : [ 'webkit' , 'css']
+tags : [ 'webkit' , 'css']
 ---
 {% include JB/setup %}
 
