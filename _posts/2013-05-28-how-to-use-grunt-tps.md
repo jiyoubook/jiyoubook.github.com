@@ -84,3 +84,9 @@ TPS Mate是TPS系统的命令行版本。其中命令行版本基于python，当
 - `tpsmatePath`是tpsmate的路径，默认值是'~/github/tpsmate/src/cli.py'。这个值是必须的。就是tpsmate的`cli.py`的路径，
 - `argv`是tpsmate的参数，比如`--inplace`(用tps路径「线上路径」替换本地路径)，参考tpsmate的命令行方式
 
+grunt-tps源码地址:[https://github.com/yize/grunt-tps]()
+
+---
+伊泽  
+2013-5-28于杭州
+
