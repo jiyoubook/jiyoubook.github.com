@@ -22,12 +22,15 @@ tags : [ "grunt" , "tps" , "tpsmate"]
 
 TPS Mate是TPS系统的命令行版本。其中命令行版本基于python，当前功能主要包括上传单张图片、批量上传图片以及样式文件中背景图片的批量上传以及输出。其目的主要为减少手工替换以及为可能出现的前端打包工具提供更为有效的支持。
 
+### 怎么安装tpsmate
+
+首先要安装`python`，[http://www.python.org/download/]()
+
 
 #### 使用tpsmate需要具备的条件：
 
 1. 淘宝内部环境，需要可以访问tms.taobao.com
 2. 有上传图片至tps的权限，看下你能否在[这里](http://tps.tms.taobao.com/photo/index.htm)上传图片
-3. 本机有tpsmate，安装配置参考[这里](http://me.tardoc.com/tpsmate/)
 
 ### 怎么使用grunt-tps
 
@@ -42,7 +45,7 @@ TPS Mate是TPS系统的命令行版本。其中命令行版本基于python，当
 
 接下来就是要安装grunt-tps
 
-
+    npm install grunt --save-dev
     npm install grunt-tps --save-dev
 
 
@@ -51,8 +54,6 @@ TPS Mate是TPS系统的命令行版本。其中命令行版本基于python，当
 
       tps: {
         options: {
-        	pythonPath:"python",
-            tpsmatePath:"~/github/tpsmate/src/cli.py",
             argv: "--inplace",
         },
         all: ['test.css', 'lib/**/*.css', 'test/**/*.scss','index.htm']
@@ -68,8 +69,6 @@ TPS Mate是TPS系统的命令行版本。其中命令行版本基于python，当
             // Configuration to be run (and then tested).
             tps: {
                 options: {
-                    pythonPath:"python",
-                    tpsmatePath: "~/github/tpsmate/src/cli.py",
                     argv: "--inplace"
                 },
                 all: ['test.css', 'lib/**/*', 'test/**/*.scss','index.htm']
@@ -79,9 +78,6 @@ TPS Mate是TPS系统的命令行版本。其中命令行版本基于python，当
         grunt.registerTask('default', ['tps']);
     };
 
-
-- `pythonPath`是python的路径，默认值是'python'。程序需要执行python，是shell中可以运行path的路径，比如`/usr/bin/python`,如果python是环境变量的话，这里可以直接填`python`
-- `tpsmatePath`是tpsmate的路径，默认值是'~/github/tpsmate/src/cli.py'。这个值是必须的。就是tpsmate的`cli.py`的路径，
 - `argv`是tpsmate的参数，比如`--inplace`(用tps路径「线上路径」替换本地路径)，参考tpsmate的命令行方式
 
 grunt-tps源码地址:[https://github.com/yize/grunt-tps]()
