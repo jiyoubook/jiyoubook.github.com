@@ -1,1 +1,0 @@
-<wb:follow-button uid="{{ site.author.weiboId }}" type="gray_1" width="67" height="24" ></wb:follow-button>
